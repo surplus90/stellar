@@ -1,29 +1,28 @@
 package com.ponyz.stellar.web.api;
 
+import com.ponyz.stellar.web.dto.SelectedCardsDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/fortune-telling")
 public class FortuneTellingController {
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
-    @GetMapping("/pick/cards")
-    public String index() {
-        // given
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        String key = "test";
+    @PostMapping("/pick-cards")
+    public String pickCards(@RequestBody SelectedCardsDto selectedCardsDto) {
+        ListOperations<String, Object> listOperations = redisTemplate.opsForList();
+        for (Integer card : selectedCardsDto.getCards()) {
+            listOperations.rightPushAll(selectedCardsDto.getKey(), card.toString());
+        }
 
-        // when
-        valueOperations.set(key, "cndnj");
-
-        // then
-        String value = valueOperations.get(key);
-
-        return value;
+        return selectedCardsDto.getKey();
     }
 }

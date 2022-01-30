@@ -1,4 +1,4 @@
-package com.ponyz.stellar.web.api.config;
+package com.ponyz.stellar.web.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
