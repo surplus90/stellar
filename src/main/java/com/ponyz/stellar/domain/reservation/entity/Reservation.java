@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -23,11 +24,14 @@ public class Reservation {
     private String title;
 
     @Column(name = "amount_cards", nullable = false)
-    private Integer amount_cards;
+    private Integer amountCards;
 
     @Column(name = "selected_cards", nullable = false)
-    private Integer selected_cards;
+    private Integer selectedCards;
 
-    @Column(insertable = false, updatable = false)
-    private Timestamp created_at;
+    @Column(name = "reservation_at", nullable = false)
+    private LocalDateTime reservationAt;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

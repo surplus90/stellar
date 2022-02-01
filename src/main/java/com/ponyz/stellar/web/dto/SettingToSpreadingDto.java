@@ -8,5 +8,6 @@ public class SettingToSpreadingDto {
     private String title;
     private Integer amountOfCards;
     private Integer selectedCards;
+    private String reservationAt;
 
 }
