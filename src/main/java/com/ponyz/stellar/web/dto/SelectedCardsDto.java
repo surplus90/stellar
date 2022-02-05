@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 public class SelectedCardsDto {
 
-    private String key;
+    private Long reservationIdx;
     private Integer[] cards;
 
 }

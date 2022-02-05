@@ -4,15 +4,9 @@ import com.ponyz.stellar.domain.reservation.entity.Reservation;
 import com.ponyz.stellar.domain.reservation.repository.ReservationRepository;
 import com.ponyz.stellar.web.dto.SelectedCardsDto;
 import com.ponyz.stellar.web.dto.SettingToSpreadingDto;
-import com.ponyz.stellar.web.vo.ResrvationListVo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -30,7 +24,7 @@ public class FortuneTellingController {
 
     @GetMapping("/reservations")
     public List<Reservation> getReservations() {
-        List<Reservation> data = reservationRepository.findAll();
+        List<Reservation> data = reservationRepository.findAllByOrderByCreatedAtDesc();
         return data;
     }
 
@@ -42,25 +36,30 @@ public class FortuneTellingController {
 
     @PostMapping("/setting")
     public String addSetting(@RequestBody SettingToSpreadingDto settingToSpreadingDto) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime reservationAt = LocalDateTime.parse(settingToSpreadingDto.getReservationAt(), formatter);
 
         reservationRepository.save(Reservation.builder()
-                .title(settingToSpreadingDto.getTitle())
+                .userName(settingToSpreadingDto.getUserName())
                 .amountCards(settingToSpreadingDto.getAmountOfCards())
                 .selectedCards(settingToSpreadingDto.getSelectedCards())
                 .reservationAt(reservationAt)
                 .build());
-        return settingToSpreadingDto.getTitle();
+        return settingToSpreadingDto.getUserName();
     }
 
     @PostMapping("/pick-cards")
-    public String addPickCards(@RequestBody SelectedCardsDto selectedCardsDto) {
+    public Long addPickCards(@RequestBody SelectedCardsDto selectedCardsDto) throws Exception {
+        Reservation data = reservationRepository.findById(selectedCardsDto.getReservationIdx()).orElseThrow(() -> new Exception("예약이 존재하지 않습니다."));
+
         ListOperations<String, Object> listOperations = redisTemplate.opsForList();
         for (Integer card : selectedCardsDto.getCards()) {
-            listOperations.rightPushAll(selectedCardsDto.getKey(), card.toString());
+            listOperations.rightPushAll(data.getIdx().toString(), card.toString());
         }
 
-        return selectedCardsDto.getKey();
+        data.setSetcardsAt(LocalDateTime.now());
+        reservationRepository.save(data);
+
+        return data.getIdx();
     }
 }

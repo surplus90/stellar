@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,8 +19,8 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idx;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "user_name", nullable = false)
+    private String userName;
 
     @Column(name = "amount_cards", nullable = false)
     private Integer amountCards;
@@ -32,6 +31,11 @@ public class Reservation {
     @Column(name = "reservation_at", nullable = false)
     private LocalDateTime reservationAt;
 
+    @Column(name = "setcards_at")
+    private LocalDateTime setcardsAt;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public void setSetcardsAt (LocalDateTime setcardsAt) { this.setcardsAt = setcardsAt; }
 }

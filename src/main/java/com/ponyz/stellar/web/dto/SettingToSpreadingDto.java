@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class SettingToSpreadingDto {
 
-    private String title;
+    private String userName;
     private Integer amountOfCards;
     private Integer selectedCards;
     private String reservationAt;
