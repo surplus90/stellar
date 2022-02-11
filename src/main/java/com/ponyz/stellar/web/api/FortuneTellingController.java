@@ -62,4 +62,14 @@ public class FortuneTellingController {
 
         return data.getIdx();
     }
+
+    @GetMapping("/show-cards/{idx}")
+    public List<Object> showPickCards(@PathVariable Long idx) throws Exception {
+        ListOperations<String, Object> listOperations = redisTemplate.opsForList();
+        Long size = listOperations.size(idx.toString());
+        if (size.equals(0L)) throw new Exception("선택 된 카드가 없습니다.");
+        List<Object> cards = listOperations.range(idx.toString(), 0, -1);
+
+        return cards;
+    }
 }
