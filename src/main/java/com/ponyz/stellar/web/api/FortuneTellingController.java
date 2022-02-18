@@ -43,7 +43,8 @@ public class FortuneTellingController {
                 .reservation(data)
                 .cards(cards)
                 .build();
-        return new ResponseEntity(result, HttpStatus.OK);
+
+        return ResponseEntity.ok().body(result);
     }
 
     @PostMapping("/setting")
