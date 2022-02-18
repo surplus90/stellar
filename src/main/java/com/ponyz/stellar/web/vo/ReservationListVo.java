@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public class ResrvationListVo {
+public class ReservationListVo {
     private Integer totalPages;
     private List<Reservation> rows;
 }

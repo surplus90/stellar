@@ -4,9 +4,12 @@ import com.ponyz.stellar.domain.reservation.entity.Reservation;
 import com.ponyz.stellar.domain.reservation.repository.ReservationRepository;
 import com.ponyz.stellar.web.dto.SelectedCardsDto;
 import com.ponyz.stellar.web.dto.SettingToSpreadingDto;
+import com.ponyz.stellar.web.vo.ReservationDetailVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -29,9 +32,18 @@ public class FortuneTellingController {
     }
 
     @GetMapping("/reservations/{idx}")
-    public Optional<Reservation> getReservationByIdx(@PathVariable Long idx) {
-        Optional<Reservation> data = reservationRepository.findById(idx);
-        return data;
+    public ResponseEntity<ReservationDetailVo> getReservationByIdx(@PathVariable Long idx) throws Exception {
+        Reservation data = reservationRepository.findById(idx).orElseThrow(() -> new Exception("예약이 존재하지 않습니다."));
+
+        ListOperations<String, Object> listOperations = redisTemplate.opsForList();
+        Long size = listOperations.size(idx.toString());
+        List<Object> cards = listOperations.range(idx.toString(), 0, -1);
+
+        ReservationDetailVo result = ReservationDetailVo.builder()
+                .reservation(data)
+                .cards(cards)
+                .build();
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @PostMapping("/setting")
