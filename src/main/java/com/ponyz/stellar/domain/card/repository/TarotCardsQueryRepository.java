@@ -10,7 +10,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Repository
-public class TarotCardsCustomRepository {
+public class TarotCardsQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     public List<TarotCards> findBySeqs(List<Integer> seqs) {

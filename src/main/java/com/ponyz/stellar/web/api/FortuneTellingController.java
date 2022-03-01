@@ -1,7 +1,7 @@
 package com.ponyz.stellar.web.api;
 
 import com.ponyz.stellar.domain.card.entity.TarotCards;
-import com.ponyz.stellar.domain.card.repository.TarotCardsCustomRepository;
+import com.ponyz.stellar.domain.card.repository.TarotCardsQueryRepository;
 import com.ponyz.stellar.domain.reservation.entity.Reservation;
 import com.ponyz.stellar.domain.reservation.repository.ReservationRepository;
 import com.ponyz.stellar.web.dto.SelectedCardsDto;
@@ -25,7 +25,7 @@ public class FortuneTellingController {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ReservationRepository reservationRepository;
-    private final TarotCardsCustomRepository tarotCardsCustomRepository;
+    private final TarotCardsQueryRepository tarotCardsQueryRepository;
 
     @GetMapping("/reservations")
     public ResponseEntity<List<Reservation>> getReservations() {
@@ -40,7 +40,7 @@ public class FortuneTellingController {
         ListOperations<String, Object> listOperations = redisTemplate.opsForList();
         List<Object> cards = listOperations.range(idx.toString(), 0, -1);
         List<Integer> convertCards = cards.stream().map(obj -> Integer.parseInt(obj.toString())).collect(Collectors.toList());
-        List<TarotCards> cardsInfo = tarotCardsCustomRepository.findBySeqs(convertCards);
+        List<TarotCards> cardsInfo = tarotCardsQueryRepository.findBySeqs(convertCards);
 
         ReservationDetailVo result = ReservationDetailVo.builder()
                 .reservation(data)
