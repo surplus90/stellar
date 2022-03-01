@@ -1,5 +1,7 @@
 package com.ponyz.stellar.web.api;
 
+import com.ponyz.stellar.domain.card.entity.TarotCards;
+import com.ponyz.stellar.domain.card.repository.TarotCardsCustomRepository;
 import com.ponyz.stellar.domain.reservation.entity.Reservation;
 import com.ponyz.stellar.domain.reservation.repository.ReservationRepository;
 import com.ponyz.stellar.web.dto.SelectedCardsDto;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fortune-telling")
@@ -22,6 +25,7 @@ public class FortuneTellingController {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ReservationRepository reservationRepository;
+    private final TarotCardsCustomRepository tarotCardsCustomRepository;
 
     @GetMapping("/reservations")
     public ResponseEntity<List<Reservation>> getReservations() {
@@ -34,12 +38,14 @@ public class FortuneTellingController {
         Reservation data = reservationRepository.findById(idx).orElseThrow(() -> new Exception("예약이 존재하지 않습니다."));
 
         ListOperations<String, Object> listOperations = redisTemplate.opsForList();
-        Long size = listOperations.size(idx.toString());
         List<Object> cards = listOperations.range(idx.toString(), 0, -1);
+        List<Integer> convertCards = cards.stream().map(obj -> Integer.parseInt(obj.toString())).collect(Collectors.toList());
+        List<TarotCards> cardsInfo = tarotCardsCustomRepository.findBySeqs(convertCards);
 
         ReservationDetailVo result = ReservationDetailVo.builder()
                 .reservation(data)
-                .cards(cards)
+                .cards(convertCards)
+                .cardsInfo(cardsInfo)
                 .build();
 
         return ResponseEntity.ok().body(result);
