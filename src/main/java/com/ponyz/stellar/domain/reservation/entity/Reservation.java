@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 
 @Getter
@@ -38,4 +39,6 @@ public class Reservation {
     private LocalDateTime createdAt;
 
     public void setSetcardsAt (LocalDateTime setcardsAt) { this.setcardsAt = setcardsAt; }
+
+    public void addSelectedCards (Integer selectedCards) { this.selectedCards += selectedCards; }
 }

@@ -65,6 +65,14 @@ public class FortuneTellingController {
         return ResponseEntity.ok().body(true);
     }
 
+    @PutMapping("/setting/{idx}/cards/{amount}")
+    public ResponseEntity putSettingMoreCards(@PathVariable Long idx, @PathVariable Integer amount) throws Exception {
+        Reservation data = reservationRepository.findById(idx).orElseThrow(() -> new Exception("예약이 존재하지 않습니다."));
+        data.addSelectedCards(amount);
+        reservationRepository.save(data);
+        return ResponseEntity.ok().body(true);
+    }
+
     @PostMapping("/pick-cards")
     public ResponseEntity<Long> addPickCards(@RequestBody SelectedCardsDto selectedCardsDto) throws Exception {
         Reservation data = reservationRepository.findById(selectedCardsDto.getReservationIdx()).orElseThrow(() -> new Exception("예약이 존재하지 않습니다."));
