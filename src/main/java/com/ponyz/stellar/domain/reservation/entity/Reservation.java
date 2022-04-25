@@ -23,6 +23,9 @@ public class Reservation {
     @Column(name = "user_name", nullable = false)
     private String userName;
 
+    @Column(name = "deck_idx", nullable = false)
+    private Long deckIdx;
+
     @Column(name = "amount_cards", nullable = false)
     private Integer amountCards;
 

@@ -1,12 +1,16 @@
 package com.ponyz.stellar.web.api;
 
 import com.ponyz.stellar.domain.card.entity.TarotCards;
+import com.ponyz.stellar.domain.card.entity.TarotDecks;
 import com.ponyz.stellar.domain.card.repository.TarotCardsQueryRepository;
+import com.ponyz.stellar.domain.card.repository.TarotDecksRepository;
 import com.ponyz.stellar.domain.reservation.entity.Reservation;
+import com.ponyz.stellar.domain.reservation.repository.ReservationQueryRepository;
 import com.ponyz.stellar.domain.reservation.repository.ReservationRepository;
 import com.ponyz.stellar.web.dto.SelectedCardsDto;
 import com.ponyz.stellar.web.dto.SettingToSpreadingDto;
 import com.ponyz.stellar.web.vo.ReservationDetailVo;
+import com.ponyz.stellar.web.vo.ReservationVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,7 +29,9 @@ public class FortuneTellingController {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ReservationRepository reservationRepository;
+    private final TarotDecksRepository tarotDecksRepository;
     private final TarotCardsQueryRepository tarotCardsQueryRepository;
+    private final ReservationQueryRepository reservationQueryRepository;
 
     @GetMapping("/reservations")
     public ResponseEntity<List<Reservation>> getReservations() {
@@ -35,7 +41,7 @@ public class FortuneTellingController {
 
     @GetMapping("/reservations/{idx}")
     public ResponseEntity<ReservationDetailVo> getReservationByIdx(@PathVariable Long idx) throws Exception {
-        Reservation data = reservationRepository.findById(idx).orElseThrow(() -> new Exception("예약이 존재하지 않습니다."));
+        ReservationVo data = reservationQueryRepository.getByIdx(idx);
 
         ListOperations<String, Object> listOperations = redisTemplate.opsForList();
         List<Object> cards = listOperations.range(idx.toString(), 0, -1);
@@ -51,6 +57,12 @@ public class FortuneTellingController {
         return ResponseEntity.ok().body(result);
     }
 
+    @GetMapping("/decks")
+    public ResponseEntity<List<TarotDecks>> getTarotDecks() {
+        List<TarotDecks> data = tarotDecksRepository.findAll();
+        return ResponseEntity.ok().body(data);
+    }
+
     @PostMapping("/setting")
     public ResponseEntity addSetting(@RequestBody SettingToSpreadingDto settingToSpreadingDto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -58,6 +70,7 @@ public class FortuneTellingController {
 
         reservationRepository.save(Reservation.builder()
                 .userName(settingToSpreadingDto.getUserName())
+                .deckIdx(settingToSpreadingDto.getDeckIdx())
                 .amountCards(settingToSpreadingDto.getAmountOfCards())
                 .selectedCards(settingToSpreadingDto.getSelectedCards())
                 .reservationAt(reservationAt)

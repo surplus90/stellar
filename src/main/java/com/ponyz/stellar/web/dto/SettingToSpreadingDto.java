@@ -6,6 +6,7 @@ import lombok.Getter;
 public class SettingToSpreadingDto {
 
     private String userName;
+    private Long deckIdx;
     private Integer amountOfCards;
     private Integer selectedCards;
     private String reservationAt;
