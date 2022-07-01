@@ -13,10 +13,13 @@ import java.util.List;
 public class TarotCardsQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<TarotCards> findBySeqs(List<Integer> seqs) {
+    public List<TarotCards> findBySeqs(Long deckIdx, List<Integer> seqs) {
         QTarotCards tarotCards = QTarotCards.tarotCards;
         return jpaQueryFactory.selectFrom(tarotCards)
-                .where(tarotCards.seq.in(seqs))
+                .where(
+                    tarotCards.deckIdx.eq(deckIdx)
+                    .and(tarotCards.seq.in(seqs))
+                )
                 .fetch();
     }
 }

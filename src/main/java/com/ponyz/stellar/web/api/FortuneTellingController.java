@@ -46,7 +46,7 @@ public class FortuneTellingController {
         ListOperations<String, Object> listOperations = redisTemplate.opsForList();
         List<Object> cards = listOperations.range(idx.toString(), 0, -1);
         List<Integer> convertCards = cards.stream().map(obj -> Integer.parseInt(obj.toString())).collect(Collectors.toList());
-        List<TarotCards> cardsInfo = tarotCardsQueryRepository.findBySeqs(convertCards);
+        List<TarotCards> cardsInfo = tarotCardsQueryRepository.findBySeqs(data.getDeckIdx(), convertCards);
 
         ReservationDetailVo result = ReservationDetailVo.builder()
                 .reservation(data)
