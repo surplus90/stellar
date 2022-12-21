@@ -28,6 +28,7 @@ public class ReservationQueryRepository {
                 tarotDecks.deckName,
                 reservation.amountCards,
                 reservation.selectedCards,
+                reservation.wayToArray,
                 reservation.reservationAt,
                 reservation.setcardsAt,
                 reservation.createdAt

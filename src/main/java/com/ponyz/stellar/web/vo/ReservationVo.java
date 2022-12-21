@@ -17,6 +17,7 @@ public class ReservationVo {
     private String deckName;
     private Integer amountCards;
     private Integer selectedCards;
+    private Integer wayToArray;
     private LocalDateTime reservationAt;
     private LocalDateTime setcardsAt;
     private LocalDateTime createdAt;

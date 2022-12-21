@@ -73,6 +73,7 @@ public class FortuneTellingController {
                 .deckIdx(settingToSpreadingDto.getDeckIdx())
                 .amountCards(settingToSpreadingDto.getAmountOfCards())
                 .selectedCards(settingToSpreadingDto.getSelectedCards())
+                .wayToArray(settingToSpreadingDto.getWayToArray())
                 .reservationAt(reservationAt)
                 .build());
         return ResponseEntity.ok().body(true);

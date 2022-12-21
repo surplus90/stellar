@@ -32,6 +32,9 @@ public class Reservation {
     @Column(name = "selected_cards", nullable = false)
     private Integer selectedCards;
 
+    @Column(name = "way_to_array", nullable = false)
+    private Integer wayToArray;
+
     @Column(name = "reservation_at", nullable = false)
     private LocalDateTime reservationAt;
 

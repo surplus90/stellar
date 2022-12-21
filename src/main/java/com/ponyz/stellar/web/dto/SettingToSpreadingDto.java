@@ -9,6 +9,7 @@ public class SettingToSpreadingDto {
     private Long deckIdx;
     private Integer amountOfCards;
     private Integer selectedCards;
+    private Integer wayToArray;
     private String reservationAt;
 
 }
