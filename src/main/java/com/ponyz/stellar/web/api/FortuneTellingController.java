@@ -17,10 +17,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 
 @RestController
 @RequestMapping("/api/fortune-telling")
@@ -40,11 +44,11 @@ public class FortuneTellingController {
     }
 
     @GetMapping("/reservations/{idx}")
-    public ResponseEntity<ReservationDetailVo> getReservationByIdx(@PathVariable Long idx) throws Exception {
-        ReservationVo data = reservationQueryRepository.getByIdx(idx);
+    public ResponseEntity<ReservationDetailVo> getReservationByIdx(@PathVariable Long idx, @RequestParam(value = "encKey", required = false) String encKey) throws Exception {
+        ReservationVo data = (idx.equals(0L))? reservationQueryRepository.getByEncKey(URLEncoder.encode(encKey, "UTF-8")) : reservationQueryRepository.getByIdx(idx);
 
         ListOperations<String, Object> listOperations = redisTemplate.opsForList();
-        List<Object> cards = listOperations.range(idx.toString(), 0, -1);
+        List<Object> cards = listOperations.range(data.getIdx().toString(), 0, -1);
         List<Integer> convertCards = cards.stream().map(obj -> Integer.parseInt(obj.toString())).collect(Collectors.toList());
         List<TarotCards> cardsInfo = tarotCardsQueryRepository.findBySeqs(data.getDeckIdx(), convertCards);
 
@@ -64,9 +68,10 @@ public class FortuneTellingController {
     }
 
     @PostMapping("/setting")
-    public ResponseEntity addSetting(@RequestBody SettingToSpreadingDto settingToSpreadingDto) {
+    public ResponseEntity addSetting(@RequestBody SettingToSpreadingDto settingToSpreadingDto) throws UnsupportedEncodingException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime reservationAt = LocalDateTime.parse(settingToSpreadingDto.getReservationAt(), formatter);
+        String encodedStr = URLEncoder.encode(Base64.getEncoder().encodeToString(reservationAt.toString().getBytes()), "UTF-8");
 
         reservationRepository.save(Reservation.builder()
                 .userName(settingToSpreadingDto.getUserName())
@@ -75,6 +80,7 @@ public class FortuneTellingController {
                 .selectedCards(settingToSpreadingDto.getSelectedCards())
                 .wayToArray(settingToSpreadingDto.getWayToArray())
                 .reservationAt(reservationAt)
+                .encKey(encodedStr)
                 .build());
         return ResponseEntity.ok().body(true);
     }

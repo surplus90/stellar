@@ -44,6 +44,9 @@ public class Reservation {
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "enc_key")
+    private String encKey;
+
     public void setSetcardsAt (LocalDateTime setcardsAt) { this.setcardsAt = setcardsAt; }
 
     public void addSelectedCards (Integer selectedCards) { this.selectedCards += selectedCards; }

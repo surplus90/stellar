@@ -38,4 +38,25 @@ public class ReservationQueryRepository {
                 .where(reservation.idx.eq(idx))
                 .fetchOne();
     }
+
+    public ReservationVo getByEncKey(String encKey) {
+        QReservation reservation = QReservation.reservation;
+        QTarotDecks tarotDecks = QTarotDecks.tarotDecks;
+        return jpaQueryFactory.select(Projections.fields(ReservationVo.class,
+                reservation.idx,
+                reservation.userName,
+                reservation.deckIdx,
+                tarotDecks.deckName,
+                reservation.amountCards,
+                reservation.selectedCards,
+                reservation.wayToArray,
+                reservation.reservationAt,
+                reservation.setcardsAt,
+                reservation.createdAt
+        ))
+                .from(reservation)
+                .innerJoin(tarotDecks).on(tarotDecks.idx.eq(reservation.deckIdx))
+                .where(reservation.encKey.eq(encKey))
+                .fetchOne();
+    }
 }
