@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.Base64;
 import java.util.Base64.Encoder;
@@ -45,7 +46,7 @@ public class FortuneTellingController {
 
     @GetMapping("/reservations/{idx}")
     public ResponseEntity<ReservationDetailVo> getReservationByIdx(@PathVariable Long idx, @RequestParam(value = "encKey", required = false) String encKey) throws Exception {
-        ReservationVo data = (idx.equals(0L))? reservationQueryRepository.getByEncKey(URLEncoder.encode(encKey, "UTF-8")) : reservationQueryRepository.getByIdx(idx);
+        ReservationVo data = (idx.equals(0L))? reservationQueryRepository.getByEncKey(encKey) : reservationQueryRepository.getByIdx(idx);
 
         ListOperations<String, Object> listOperations = redisTemplate.opsForList();
         List<Object> cards = listOperations.range(data.getIdx().toString(), 0, -1);
@@ -71,7 +72,7 @@ public class FortuneTellingController {
     public ResponseEntity addSetting(@RequestBody SettingToSpreadingDto settingToSpreadingDto) throws UnsupportedEncodingException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime reservationAt = LocalDateTime.parse(settingToSpreadingDto.getReservationAt(), formatter);
-        String encodedStr = URLEncoder.encode(Base64.getEncoder().encodeToString(reservationAt.toString().getBytes()), "UTF-8");
+        String uid = UUID.randomUUID().toString();
 
         reservationRepository.save(Reservation.builder()
                 .userName(settingToSpreadingDto.getUserName())
@@ -80,7 +81,7 @@ public class FortuneTellingController {
                 .selectedCards(settingToSpreadingDto.getSelectedCards())
                 .wayToArray(settingToSpreadingDto.getWayToArray())
                 .reservationAt(reservationAt)
-                .encKey(encodedStr)
+                .encKey(uid)
                 .build());
         return ResponseEntity.ok().body(true);
     }
